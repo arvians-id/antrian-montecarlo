@@ -1,0 +1,62 @@
+[
+    {
+        "pelanggan": 1,
+        "kedatangan": "9:08",
+        "dilayani": "9:08",
+        "selesai": "9:11"
+    },
+    {
+        "pelanggan": 2,
+        "kedatangan": "9:14",
+        "dilayani": "9:14",
+        "selesai": "9:17"
+    },
+    {
+        "pelanggan": 3,
+        "kedatangan": "9:14",
+        "dilayani": "9:17",
+        "selesai": "9:18"
+    },
+    {
+        "pelanggan": 4,
+        "kedatangan": "9:18",
+        "dilayani": "9:18",
+        "selesai": "9:21"
+    },
+    {
+        "pelanggan": 5,
+        "kedatangan": "9:18",
+        "dilayani": "9:21",
+        "selesai": "9:23"
+    },
+    {
+        "pelanggan": 6,
+        "kedatangan": "9:19",
+        "dilayani": "9:23",
+        "selesai": "9:24"
+    },
+    {
+        "pelanggan": 7,
+        "kedatangan": "9:21",
+        "dilayani": "9:23",
+        "selesai": "9:25"
+    },
+    {
+        "pelanggan": 8,
+        "kedatangan": "9:23",
+        "dilayani": "9:24",
+        "selesai": "9:27"
+    },
+    {
+        "pelanggan": 9,
+        "kedatangan": "9:25",
+        "dilayani": "9:27",
+        "selesai": "9:30"
+    },
+    {
+        "pelanggan": 10,
+        "kedatangan": "9:28",
+        "dilayani": "9:30",
+        "selesai": "9:32"
+    }
+]
