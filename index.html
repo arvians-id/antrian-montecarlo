@@ -1,7 +1,11 @@
+<!-- CREATED BY WIDDY ARFIANSYAH -->
+<!-- Follow My Github https://github.com/arvians-id -->
+<!-- https://github.com/arvians-id/antrian-montecarlo -->
+<!-- Sumber Data https://media.neliti.com/media/publications/275681-pemodelan-dan-simulasi-sistem-antrian-pe-e7e0166c.pdf -->
+
 <!doctype html>
 <html lang="en">
   <head>
-    <!-- Required meta tags -->
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
 
@@ -17,7 +21,8 @@
   </head>
   <body>
       <div class="">
-          
+        <h1><i>CREATED BY WIDDY ARFIANSYAH - MONTECARLO</i></h1>
+        <p>Sistem Antrian Pelanggan Pada PT X Menggunakan Metode Montecarlo</p>
         <hr>
         <h3 class="text-center">Data Antrian Loket</h3>
         <hr>
@@ -115,204 +120,14 @@
             </tbody>
         </table>
       </div>
+
+    <iframe id="my_iframe" style="display:none;"></iframe>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
-    <script>
-        const tableAntrian = document.querySelector('#table-antrian');
-        const tableLoket = document.querySelector('#table-loket');
-        const tableKedatangan = document.querySelector('#table-kedatangan');
-        const tablePelayanan = document.querySelector('#table-pelayanan');
-        const tableSimulasi = document.querySelector('#table-simulasi');
-        const file = fetch('data.json').then(res => res.json());
-
-        const convertToTime = time => {
-            let array = time.split(':');
-            return (+array[0]) * 60 * 60 + (+array[1]) * 60;
-        };
-        const check = (bil, first, end) => {
-            if(bil >= first && bil <= end){
-                return true;
-            }
-            return false;
-        }
-        const print = async () => {
-            const datas = await file;
-            
-            // Tabel Pertama
-            let dataTable = '';
-            let jumlahWaktuAntrian = 0;
-            let waktuPelayanan = [];
-            let split = []
-            datas.forEach((data, i) => {
-                const kedatangan = convertToTime(data.kedatangan);
-                const dilayani = convertToTime(data.dilayani);
-                const selesai = convertToTime(data.selesai);
-
-                const lamaPelayanan = (selesai - dilayani) / 60;
-                const waktuDalamSistem = (selesai - kedatangan) / 60;
-                const waktuDalamAantrian = (dilayani - kedatangan) / 60;
-
-                waktuPelayanan.push(lamaPelayanan);
-
-                jumlahWaktuAntrian += waktuDalamAantrian;
-                dataTable += `<tr>
-                                <td>${i + 1}</td>
-                                <td>${data.kedatangan}</td>
-                                <td>${data.dilayani}</td>
-                                <td>${data.selesai}</td>
-                                <td></td>
-                                <td>${lamaPelayanan}</td>
-                                <td>${waktuDalamSistem}</td>
-                                <td>${waktuDalamAantrian}</td>
-                              </tr>`;
-
-                split.push(+data.kedatangan.split(':')[1]);
-            })
-            let waktuKedatangan = [];
-            for(let i= split.length; i >= 0; i--){
-                let newArray = split[i] - split[i - 1];
-                if(!isNaN(newArray)) waktuKedatangan.push(newArray)
-            }
-            
-            dataTable += `<tr>
-                            <td colspan="7">Rata-rata waktu menunggu antrian</td>
-                            <td>${(jumlahWaktuAntrian / datas.length).toFixed(2)} Menit</td>
-                          </tr>`;
-            
-            tableAntrian.innerHTML = dataTable;
-            
-            // Tabel Kedua
-            const minWaktuKedatangan = Math.min.apply(null, waktuKedatangan);
-            const maxWaktuKedatangan = Math.max.apply(null, waktuKedatangan);
-
-            const minWaktuPelayanan = Math.min.apply(null, waktuPelayanan);
-            const maxWaktuPelayanan = Math.max.apply(null, waktuPelayanan);
-            const nilaiInterval = Math.floor(datas.length / Math.max.apply(null, waktuPelayanan));
-                    
-            tableLoket.innerHTML = `<tr>
-                                        <td>Jumlah Pelanggan</td>
-                                        <td>${datas.length} Pelanggan</td>
-                                    </tr>
-                                    <tr>
-                                        <td>Waktu Kedatangan</td>
-                                        <td>${minWaktuKedatangan + ' - ' + maxWaktuKedatangan} Menit</td>
-                                    </tr>
-                                    <tr>
-                                        <td>Waktu Pelayanan</td>
-                                        <td>${minWaktuPelayanan + ' - ' + maxWaktuPelayanan} Menit</td>
-                                    </tr>
-                                    <tr>
-                                        <td>Jumlah Interval</td>
-                                        <td>${datas.length}/${maxWaktuPelayanan} = ${ nilaiInterval } Nilai</td>
-                                    </tr>`;
-            
-            // Tabel Ketiga
-            let dataTableWaktuKedatangan = '';
-            let dataIntvalKedatangan = [];
-            let startKedatangan = 1;
-            let endKedatangan = 0;
-            for(let i=minWaktuKedatangan; i<=maxWaktuKedatangan; i++){
-                endKedatangan = endKedatangan + nilaiInterval
-                dataTableWaktuKedatangan += `<tr>
-                                                <td>${i}</td>
-                                                <td>${startKedatangan} - ${endKedatangan}</td>
-                                             </tr>`;
-
-                dataIntvalKedatangan.push([startKedatangan, endKedatangan, i]);
-                startKedatangan = endKedatangan + 1
-            }
-            tableKedatangan.innerHTML = dataTableWaktuKedatangan;
-            
-            // Table Keempat
-            let dataTableWaktuPelayanan = '';
-            let dataIntvalPelayanan = [];
-            let startPelayanan = 1;
-            let endPelayanan = 0;
-            for(let i=minWaktuPelayanan; i<=maxWaktuPelayanan; i++){
-                endPelayanan = endPelayanan + nilaiInterval
-                dataTableWaktuPelayanan += `<tr>
-                                                <td>${i}</td>
-                                                <td>${startPelayanan} - ${endPelayanan}</td>
-                                             </tr>`;
-                dataIntvalPelayanan.push([startPelayanan, endPelayanan, i]);
-                startPelayanan = endPelayanan + 1
-            }
-            tablePelayanan.innerHTML = dataTableWaktuPelayanan;
-
-            // Tabel Kelima
-            let dataTableSimulasi = '';
-            let count;
-            for(let i=0; i<datas.length;i++){
-                const kedatangan = convertToTime(datas[i].kedatangan);
-                const dilayani = convertToTime(datas[i].dilayani);
-                const selesai = convertToTime(datas[i].selesai);
-
-                const waktuDalamSistem = (selesai - kedatangan) / 60;
-                const waktuDalamAantrian = (dilayani - kedatangan) / 60;
-
-                // Bilangan acak pertama
-                let bilAcak = Math.floor(Math.random() * datas.length) + 1;
-                let intvalAcak = 0;
-                dataIntvalKedatangan.map(val => {
-                    if(check(bilAcak, val[0], val[1])){
-                        intvalAcak = val[2]
-                    }
-                })
-
-                // Bilangan acak kedua
-                let bilAcakKedua = Math.floor(Math.random() * datas.length) + 1;
-                let intvalAcakKedua = 0;
-                dataIntvalPelayanan.map(val => {
-                    if(check(bilAcakKedua, val[0], val[1])){
-                        intvalAcakKedua = val[2]
-                    }
-                })
-                
-                // 
-                let first = datas[i].kedatangan.split(':')[1];
-                let end = datas[i - 1] == undefined ? 0 : datas[i - 1].selesai.split(':')[1];
-                let status = (i > 0 ? count : end) <= first;
-                let td = '';
-                if(status == true){
-                    td =`<td>${datas[i].dilayani}</td>
-                            <td>${bilAcakKedua}</td>
-                            <td>${intvalAcakKedua}</td>
-                            <td>${datas[i].selesai}</td>
-                            <td>-</td>
-                            <td>-</td>
-                            <td>-</td>
-                            <td>-</td>`;
-
-                    count = datas[i].selesai.split(':')[1];
-                }
-
-                if(status == false){
-                    td =`<td>-</td>
-                         <td>-</td>
-                         <td>-</td>
-                         <td>-</td>
-                         <td>${datas[i].dilayani}</td>
-                         <td>${bilAcakKedua}</td>
-                         <td>${intvalAcakKedua}</td>
-                         <td>${datas[i].selesai}</td>`
-                }
-                
-                dataTableSimulasi += `<tr>
-                                        <td>${i + 1}</td>
-                                        <td>${bilAcak}</td>
-                                        <td>${intvalAcak}</td>
-                                        <td>${datas[i].kedatangan}</td>`
-                                        + td +
-                                        `<td>${waktuDalamSistem}</td>
-                                        <td>${waktuDalamAantrian}</td>
-                                      </tr>`;
-            }
-            dataTableSimulasi += `<tr>
-                            <td colspan="13">Rata-rata waktu menunggu antrian</td>
-                            <td>${(jumlahWaktuAntrian / datas.length).toFixed(2)} Menit</td>
-                          </tr>`;
-            tableSimulasi.innerHTML = dataTableSimulasi;
-        }
-        print()
-    </script>
+    <script src="index.js"></script>
   </body>
 </html>
+
+<!-- CREATED BY WIDDY ARFIANSYAH -->
+<!-- Follow My Github https://github.com/arvians-id -->
+<!-- https://github.com/arvians-id/antrian-montecarlo -->
+<!-- Sumber Data https://media.neliti.com/media/publications/275681-pemodelan-dan-simulasi-sistem-antrian-pe-e7e0166c.pdf -->
