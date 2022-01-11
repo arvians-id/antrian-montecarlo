@@ -16,7 +16,12 @@
     </style>
   </head>
   <body>
-      <div class="container">
+      <div class="">
+          
+        <hr>
+        <h3 class="text-center">Data Antrian Loket</h3>
+        <hr>
+
         <table class="table table-bordered table-striped">
             <thead>
                 <tr class="text-center">
@@ -34,6 +39,10 @@
             </tbody>
         </table>
 
+        <hr>
+        <h3 class="text-center">Data Input Loket Pengiriman</h3>
+        <hr>
+
         <table class="table table-bordered table-striped">
             <thead>
                 <tr class="text-center">
@@ -45,6 +54,10 @@
             </tbody>
         </table>
 
+        <hr>
+        <h3 class="text-center">Interval Selisih Waktu Kedatangan</h3>
+        <hr>
+
         <table class="table table-bordered table-striped">
             <thead>
                 <tr class="text-center">
@@ -55,47 +68,101 @@
             <tbody id="table-kedatangan" class="text-center">
             </tbody>
         </table>
+
+        <hr>
+        <h3 class="text-center">Interval Selisih Waktu Pelayanan</h3>
+        <hr>
+
+        <table class="table table-bordered table-striped">
+            <thead>
+                <tr class="text-center">
+                    <th>Interval Waktu Pelayanan</th>
+                    <th>Bilangan Acak</th>
+                </tr>
+            </thead>
+            <tbody id="table-pelayanan" class="text-center">
+            </tbody>
+        </table>
+
+        <hr>
+        <h3 class="text-center">Simulasi Antrian Montecarlo</h3>
+        <hr>
+
+        <table class="table table-bordered table-striped">
+            <thead>
+                <tr class="text-center">
+                    <th rowspan="2">Pelanggan</th>
+                    <th rowspan="2">Bilangan Random</th>
+                    <th rowspan="2">Interval Waktu Kedatangan</th>
+                    <th rowspan="2">Antrian Waktu Datang</th>
+                    <th colspan="4">Loket Pengiriman 1</th>
+                    <th colspan="4">Loket Pengiriman 2</th>
+                    <th rowspan="2">Waktu Dalam Sistem (Menit)</th>
+                    <th rowspan="2">Waktu Dalam Antrian (Menit)</th>
+                </tr>
+                <tr class="text-center">
+                    <th>Waktu Mulai Dilayani</th>
+                    <th>Bilangan Random</th>
+                    <th>Lama Pelayanan</th>
+                    <th>Waktu Selesai DIlayani</th>
+                    <th>Waktu Mulai Dilayani</th>
+                    <th>Bilangan Random</th>
+                    <th>Lama Pelayanan</th>
+                    <th>Waktu Selesai DIlayani</th>
+                </tr>
+            </thead>
+            <tbody id="table-simulasi" class="text-center">
+            </tbody>
+        </table>
       </div>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
     <script>
         const tableAntrian = document.querySelector('#table-antrian');
         const tableLoket = document.querySelector('#table-loket');
         const tableKedatangan = document.querySelector('#table-kedatangan');
+        const tablePelayanan = document.querySelector('#table-pelayanan');
+        const tableSimulasi = document.querySelector('#table-simulasi');
         const file = fetch('data.json').then(res => res.json());
 
         const convertToTime = time => {
             let array = time.split(':');
             return (+array[0]) * 60 * 60 + (+array[1]) * 60;
         };
-        
+        const check = (bil, first, end) => {
+            if(bil >= first && bil <= end){
+                return true;
+            }
+            return false;
+        }
         const print = async () => {
             const datas = await file;
             
+            // Tabel Pertama
             let dataTable = '';
             let jumlahWaktuAntrian = 0;
             let waktuPelayanan = [];
             let split = []
-            datas.forEach(data => {
+            datas.forEach((data, i) => {
                 const kedatangan = convertToTime(data.kedatangan);
                 const dilayani = convertToTime(data.dilayani);
                 const selesai = convertToTime(data.selesai);
 
                 const lamaPelayanan = (selesai - dilayani) / 60;
                 const waktuDalamSistem = (selesai - kedatangan) / 60;
-                const waktuMengantri = (dilayani - kedatangan) / 60;
+                const waktuDalamAantrian = (dilayani - kedatangan) / 60;
 
                 waktuPelayanan.push(lamaPelayanan);
 
-                jumlahWaktuAntrian += waktuMengantri;
+                jumlahWaktuAntrian += waktuDalamAantrian;
                 dataTable += `<tr>
-                                <td>${data.pelanggan}</td>
+                                <td>${i + 1}</td>
                                 <td>${data.kedatangan}</td>
                                 <td>${data.dilayani}</td>
                                 <td>${data.selesai}</td>
                                 <td></td>
                                 <td>${lamaPelayanan}</td>
                                 <td>${waktuDalamSistem}</td>
-                                <td>${waktuMengantri}</td>
+                                <td>${waktuDalamAantrian}</td>
                               </tr>`;
 
                 split.push(+data.kedatangan.split(':')[1]);
@@ -113,6 +180,7 @@
             
             tableAntrian.innerHTML = dataTable;
             
+            // Tabel Kedua
             const minWaktuKedatangan = Math.min.apply(null, waktuKedatangan);
             const maxWaktuKedatangan = Math.max.apply(null, waktuKedatangan);
 
@@ -137,18 +205,112 @@
                                         <td>${datas.length}/${maxWaktuPelayanan} = ${ nilaiInterval } Nilai</td>
                                     </tr>`;
             
+            // Tabel Ketiga
             let dataTableWaktuKedatangan = '';
-            let z = 0;
-            let x = 1;
-            for(let i=minWaktuKedatangan; i<maxWaktuPelayanan; i++){
-                z = z + nilaiInterval
+            let dataIntvalKedatangan = [];
+            let startKedatangan = 1;
+            let endKedatangan = 0;
+            for(let i=minWaktuKedatangan; i<=maxWaktuKedatangan; i++){
+                endKedatangan = endKedatangan + nilaiInterval
                 dataTableWaktuKedatangan += `<tr>
                                                 <td>${i}</td>
-                                                <td>${x} - ${z}</td>
-                                            </tr>`
-                x = z + 1
+                                                <td>${startKedatangan} - ${endKedatangan}</td>
+                                             </tr>`;
+
+                dataIntvalKedatangan.push([startKedatangan, endKedatangan, i]);
+                startKedatangan = endKedatangan + 1
             }
             tableKedatangan.innerHTML = dataTableWaktuKedatangan;
+            
+            // Table Keempat
+            let dataTableWaktuPelayanan = '';
+            let dataIntvalPelayanan = [];
+            let startPelayanan = 1;
+            let endPelayanan = 0;
+            for(let i=minWaktuPelayanan; i<=maxWaktuPelayanan; i++){
+                endPelayanan = endPelayanan + nilaiInterval
+                dataTableWaktuPelayanan += `<tr>
+                                                <td>${i}</td>
+                                                <td>${startPelayanan} - ${endPelayanan}</td>
+                                             </tr>`;
+                dataIntvalPelayanan.push([startPelayanan, endPelayanan, i]);
+                startPelayanan = endPelayanan + 1
+            }
+            tablePelayanan.innerHTML = dataTableWaktuPelayanan;
+
+            // Tabel Kelima
+            let dataTableSimulasi = '';
+            let count;
+            for(let i=0; i<datas.length;i++){
+                const kedatangan = convertToTime(datas[i].kedatangan);
+                const dilayani = convertToTime(datas[i].dilayani);
+                const selesai = convertToTime(datas[i].selesai);
+
+                const waktuDalamSistem = (selesai - kedatangan) / 60;
+                const waktuDalamAantrian = (dilayani - kedatangan) / 60;
+
+                // Bilangan acak pertama
+                let bilAcak = Math.floor(Math.random() * datas.length) + 1;
+                let intvalAcak = 0;
+                dataIntvalKedatangan.map(val => {
+                    if(check(bilAcak, val[0], val[1])){
+                        intvalAcak = val[2]
+                    }
+                })
+
+                // Bilangan acak kedua
+                let bilAcakKedua = Math.floor(Math.random() * datas.length) + 1;
+                let intvalAcakKedua = 0;
+                dataIntvalPelayanan.map(val => {
+                    if(check(bilAcakKedua, val[0], val[1])){
+                        intvalAcakKedua = val[2]
+                    }
+                })
+                
+                // 
+                let first = datas[i].kedatangan.split(':')[1];
+                let end = datas[i - 1] == undefined ? 0 : datas[i - 1].selesai.split(':')[1];
+                let status = (i > 0 ? count : end) <= first;
+                let td = '';
+                if(status == true){
+                    td =`<td>${datas[i].dilayani}</td>
+                            <td>${bilAcakKedua}</td>
+                            <td>${intvalAcakKedua}</td>
+                            <td>${datas[i].selesai}</td>
+                            <td>-</td>
+                            <td>-</td>
+                            <td>-</td>
+                            <td>-</td>`;
+
+                    count = datas[i].selesai.split(':')[1];
+                }
+
+                if(status == false){
+                    td =`<td>-</td>
+                         <td>-</td>
+                         <td>-</td>
+                         <td>-</td>
+                         <td>${datas[i].dilayani}</td>
+                         <td>${bilAcakKedua}</td>
+                         <td>${intvalAcakKedua}</td>
+                         <td>${datas[i].selesai}</td>`
+                }
+                
+                dataTableSimulasi += `<tr>
+                                        <td>${i + 1}</td>
+                                        <td>${bilAcak}</td>
+                                        <td>${intvalAcak}</td>
+                                        <td>${datas[i].kedatangan}</td>`
+                                        + td +
+                                        `<td>${waktuDalamSistem}</td>
+                                        <td>${waktuDalamAantrian}</td>
+                                      </tr>`;
+            }
+            dataTableSimulasi += `<tr>
+                            <td colspan="13">Rata-rata waktu menunggu antrian</td>
+                            <td>${(jumlahWaktuAntrian / datas.length).toFixed(2)} Menit</td>
+                          </tr>`;
+            tableSimulasi.innerHTML = dataTableSimulasi;
         }
         print()
     </script>
